@@ -1,14 +1,21 @@
-from rest_framework import status
+from django.http import FileResponse
+from rest_framework import status, mixins
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from book.models import Book, ExportBooksTask
 from book.serializers import BookSerializer, ExportBooksTaskSerializer
 
 
-class BookViewSet(ModelViewSet):
+class BookViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet
+):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
@@ -31,8 +38,13 @@ def create_task(request):
 
 @api_view(['GET'])
 def get_file(request, task_id: int):
+    try:
+        export_task = ExportBooksTask.objects.get(id=task_id, status=ExportBooksTask.TaskStatus.COMPLETED)
+    except ExportBooksTask.DoesNotExist:
+        raise NotFound(detail="Task not found")
 
-    return Response(status=status.HTTP_200_OK)
+    filepath: str = export_task.filepath
+    return FileResponse(open(filepath, 'rb'), as_attachment=True, filename='books.cvs')
 
 
 @api_view(['GET'])
