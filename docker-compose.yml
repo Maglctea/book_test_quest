@@ -1,4 +1,5 @@
 services:
+
   db:
     image: postgres:17.1
     volumes:
@@ -9,9 +10,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
-    ports:
-      - '5433:5432'
-
 
   app:
     build: .
@@ -26,8 +24,20 @@ services:
     depends_on:
       - db
     restart: always
-    ports:
-      - '8000:8000'
+
+
+  worker:
+    build: .
+    command: >
+      bash -c 'while !</dev/tcp/db/5432; do sleep 1; done;
+      python manage.py start_export_books_worker 10 30;
+      '
+    volumes:
+      - .:/app
+    env_file: .env
+    depends_on:
+      - db
+    restart: always
 
 
   nginx:
@@ -41,7 +51,7 @@ services:
       - media:/var/www/app/media
       - static:/var/www/app/static
     ports:
-      - "127.0.0.1:8500:80"
+      - "127.0.0.1:80:80"
 
 
 volumes:

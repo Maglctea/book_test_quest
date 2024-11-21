@@ -8,10 +8,9 @@ from book.urls import router as book_router
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Snippets API",
+        title="Book API",
         default_version='v1',
         description="Test quest with book api",
-        terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="daniil.shcherbakov@nordclan.com"),
         license=openapi.License(name="BSD License"),
     ),
