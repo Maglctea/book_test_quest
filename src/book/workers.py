@@ -1,5 +1,6 @@
 import csv
 import os
+from _csv import _writer
 from datetime import datetime
 from time import sleep
 
@@ -40,7 +41,7 @@ class ExportBookTaskWorker:
 
     def build_file(self, filepath: str, export_time: datetime) -> str:
         with open(filepath, mode='w', newline='', encoding='utf-8') as csv_file:
-            writer = csv.writer(csv_file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer: _writer = csv.writer(csv_file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(['Title', 'Description', 'Price'])
 
             offset: int = 0

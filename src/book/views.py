@@ -25,8 +25,8 @@ class BookViewSet(
 
         book, is_new = Book.objects.get_or_create(**serializer.data)
 
-        data = serializer.to_representation(book)
-        headers = self.get_success_headers(data)
+        data: dict = serializer.to_representation(book)
+        headers: dict = self.get_success_headers(data)
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
 
@@ -39,7 +39,7 @@ def create_task(request):
 @api_view(['GET'])
 def get_file(request, task_id: int):
     try:
-        export_task = ExportBooksTask.objects.get(id=task_id, status=ExportBooksTask.TaskStatus.COMPLETED)
+        export_task: ExportBooksTask = ExportBooksTask.objects.get(id=task_id, status=ExportBooksTask.TaskStatus.COMPLETED)
     except ExportBooksTask.DoesNotExist:
         raise NotFound(detail="Task not found")
 
@@ -50,9 +50,9 @@ def get_file(request, task_id: int):
 @api_view(['GET'])
 def get_task_status(request, task_id: int):
     try:
-        export_task = ExportBooksTask.objects.get(id=task_id)
+        export_task: ExportBooksTask = ExportBooksTask.objects.get(id=task_id)
     except ExportBooksTask.DoesNotExist:
         raise NotFound(detail="Task not found")
 
-    data = ExportBooksTaskSerializer(export_task).data
+    data: dict = ExportBooksTaskSerializer(export_task).data
     return Response(data, status=status.HTTP_200_OK)
